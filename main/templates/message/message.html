@@ -1,0 +1,65 @@
+{% extends "main.html" %}
+{% block main_content %}
+<div class="list-group col-8">
+    <a href="/" class="list-group-item list-group-item-action d-flex gap-3 py-3 mb-5" aria-current="true">
+        <img src="https://github.com/twbs.png" alt="twbs" width="32" height="32" class="rounded-circle flex-shrink-0">
+        <div class="d-flex gap-2 w-100 justify-content-between">
+            <div>
+            <h6 class="mb-0" id="message_body">{{ message.body }}</h6>
+            <p class="mb-0 opacity-75" id="message_author">Sent by {{ message.author }}</p>
+            </div>
+            <small class="opacity-50 text-nowrap" id="message_created">{{ message.created }}</small>
+        </div>
+    </a>
+    <div class="d-flex gap-3 justify-content-center">
+        {% for button in buttons %}
+            <button name="button" onclick="run_function('{{ button }}')" class="btn btn-primary btn-lg py-3 col-4">{{ button }}</button>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block main_javascript %}
+<script>
+    $.ajaxSetup({ 
+        beforeSend: function(xhr, settings) {
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                // Only send the token to relative URLs i.e. locally.
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        } 
+    })
+    function run_function(text){
+        $.ajax({
+            url : "{% url 'send_message' %}", // the endpoint
+            type : "POST", // http method
+            data : {
+                button_text: text
+            }, // data sent with the get request
+            success : function(json) {
+                $("#message_body").html(json.body)
+                $("#message_author").html("Sent by " + json.author)
+                $("#message_created").html(json.created)
+            },
+            error : function(xhr,errmsg,err) {
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+    };
+</script>
+{% endblock%}

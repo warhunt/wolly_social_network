@@ -1,0 +1,17 @@
+{% extends "index.html" %}
+{% block title %}Home{% endblock %}
+{% block button %}
+    <div class="me-3">Hello, {{ user.username }}</div>
+    <a href="/logout" class="btn btn-outline-primary me-2 text-reset text-decoration-none text-primary">Logout</a>
+{% endblock %}
+{% block content %}
+    <div class="container d-flex justify-content-center align-items-center py-5">
+        {% block main_content%}
+        {% endblock %}
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    {% block main_javascript %}
+    {% endblock %}
+{% endblock %}
