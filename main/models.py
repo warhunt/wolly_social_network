@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 
 class MessageManager(models.Manager):
     def create_message(self, body, author):
-        message = self.create(body=body, author=author)
+        user = User.objects.get(username=author)
+        message = self.create(body=body, author=user)
         return message
 
 class Message(models.Model):

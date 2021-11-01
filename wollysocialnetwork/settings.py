@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'social_django',
+    'channels',
     'main',
     'login'    
 ]
@@ -73,7 +74,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'wollysocialnetwork.wsgi.application'
-
+ASGI_APPLICATION = 'wollysocialnetwork.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -147,6 +148,16 @@ AUTHENTICATION_BACKENDS = [
     'social_core.backends.facebook.FacebookOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": 'channels_redis.core.RedisChannelLayer',
+        "CONFIG": {
+            "hosts": [os.environ.get('REDIS_URL', ('127.0.0.1', 6379))],
+        },
+    },
+}
+
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY') 
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET') 

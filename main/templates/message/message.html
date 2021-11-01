@@ -21,45 +21,26 @@
 
 {% block main_javascript %}
 <script>
-    $.ajaxSetup({ 
-        beforeSend: function(xhr, settings) {
-            function getCookie(name) {
-                var cookieValue = null;
-                if (document.cookie && document.cookie != '') {
-                    var cookies = document.cookie.split(';');
-                    for (var i = 0; i < cookies.length; i++) {
-                        var cookie = jQuery.trim(cookies[i]);
-                        // Does this cookie string begin with the name we want?
-                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
-            }
-            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-                // Only send the token to relative URLs i.e. locally.
-                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-            }
-        } 
-    })
     function run_function(text){
-        $.ajax({
-            url : "{% url 'send_message' %}", // the endpoint
-            type : "POST", // http method
-            data : {
-                button_text: text
-            }, // data sent with the get request
-            success : function(json) {
-                $("#message_body").html(json.body)
-                $("#message_author").html("Sent by " + json.author)
-                $("#message_created").html(json.created)
-            },
-            error : function(xhr,errmsg,err) {
-                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-            }
-        });
+        json = {"body": text , "author": "{{ user.username }}"};
+        chat_socket.send(JSON.stringify(json));
     };
+
+    var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+    const chat_socket = new WebSocket(
+        ws_scheme
+        + '://'
+        + window.location.host
+        + '/chat/'
+    );
+
+    chat_socket.onmessage = function(message) {
+        var data = JSON.parse(message.data);
+
+        $("#message_body").html(data.body)
+        $("#message_author").html("Sent by " + data.author)
+        $("#message_created").html(data.created)
+    };
+    
 </script>
 {% endblock%}
