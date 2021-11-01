@@ -8,12 +8,12 @@ from django.conf import settings
 
 from .models import Message
 
-#@login_required
+@login_required
 def main(request):
     message = Message.objects.first()
     return render(request, 'message/message.html', {'message': message, 'buttons': settings.CONST.get('buttons')})
 
-#@login_required
+@login_required
 def send_message(request):
     if request.POST:
         user = request.user
